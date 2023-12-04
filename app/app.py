@@ -36,6 +36,31 @@ def consecutive_duplicates(duplicate):
     return bool(re.search(r'(.)\1{3,}', duplicate))
 
 
+def check_guests_registration():
+    '''Conecting with DB'''
+    conn = sqlite3.connect('Christmas_Table.db')
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM guests')
+
+        rows = cursor.fetchall()
+
+        # Verificar se há registros na tabela
+        if not rows:
+            print('Nobody at the Christmas Table!')
+        else:
+            print('These are the lucky guests on the Christmas Table:')
+            for row in rows:
+                print(row)
+
+    except sqlite3.Error as e:
+        print(f"Error acessing data base: {e}")
+
+    finally:
+        conn.close()
+
+
 class MyApp(GridLayout):
     def __init__(self, **kwargs):
         super(MyApp, self).__init__()
@@ -63,15 +88,15 @@ class MyApp(GridLayout):
                                 on_text_validate=self.validate_numeric)
         self.add_widget(self.st_age)
 
-        self.add_widget(Label(text='Country'))
+        self.add_widget(Label(text='Where do you come from?'))
         self.st_country = TextInput(multiline=False)
         self.add_widget(self.st_country)
 
-        self.add_widget(Label(text='Intensions'))
+        self.add_widget(Label(text='Something you would like to share'))
         self.st_intensions = TextInput(multiline=False)
         self.add_widget(self.st_intensions)
 
-        self.add_widget(Label(text='How many Gifts do you bring'))
+        self.add_widget(Label(text='How many Gifts do you bring?'))
         self.st_gifts = TextInput(multiline=False,
                                   input_type='number',
                                   on_text_validate=self.validate_numeric)
@@ -90,7 +115,7 @@ class MyApp(GridLayout):
         self.conn = sqlite3.connect('Christmas_Table.db')
         self.cursor = self.conn.cursor()
 
-        # Taable Creation
+        # Table Creation
         self.cursor.execute('''
                             CREATE TABLE IF NOT EXISTS guests (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,23 +140,6 @@ class MyApp(GridLayout):
             print('Invalid Entry!\nPlease enter a valid one!\n')
 
     def validate_numeric(self, input_number):
-        # try:
-        #     number = int(input_number)
-        #     if number < 0:
-        #         if not getattr(self, 'error_displayed', False):
-        #             print('You can not input a negative number!\n')
-        #             # setattr(self, 'age_error_displayed', True)
-        #             self.error_displayed = True
-        #             return False
-        #     return True
-        # except ValueError:
-        #     # if not getattr(self, 'error_displayed', False):
-        #     if not self.error_displayed:
-        #         self.st_age.text = ''
-        #         self.st_gifts.text = ''
-        #         print('Invalid entry!\nPlease enter an integer value!\n')
-        #         self.error_displayed = True
-        #     return False
         if not input_number.isnumeric():
             if not self.error_displayed:
                 self.st_age.text = ''
@@ -156,7 +164,6 @@ class MyApp(GridLayout):
         self.error_displayed = False
 
         # Name is Valid
-        # self.validate_name(self.st_name)
         person_name = self.st_name.text.strip()
         if not valid_name(self.st_name.text):
             self.st_name.text = ''
@@ -164,7 +171,6 @@ class MyApp(GridLayout):
             return
 
         # Surname is Valid
-        # self.validate_name(self.st_surname)
         person_surname = self.st_surname.text.strip()
         if not valid_name(self.st_surname.text):
             self.st_surname.text = ''
@@ -176,13 +182,6 @@ class MyApp(GridLayout):
             print('Name and Surname must be different!\n')
             return
 
-        # Check if the Name is a repeat
-        # if person_name in self.previous_names:
-        #     print('Name must be different from previous entries!')
-        #     return
-        # else:
-        #     self.previous_names.add(person_name)
-
         # Age and Gits are integers
         age_is_numeric = self.validate_numeric(self.st_age.text)
         if not age_is_numeric:
@@ -192,6 +191,7 @@ class MyApp(GridLayout):
         if not gifts_is_numeric:
             print('Please enter a valid number of gifts, must be an integer!\n') # noqa E401
             return
+
         # Gender and Behaviour Buttons were used
         if self.st_gender.text == 'Select':
             print('Please enter your Gender!\n')
@@ -220,30 +220,28 @@ class MyApp(GridLayout):
             else:
                 print('Congratulations!\nYour seat at the Christmas Table is secured!\nGet ready to jingle all the way!!\n')  # noqa E401
 
-        # Connection in sqlite
-        try:
-            conn = sqlite3.connect('Christmas_Table.db')
-            cursor = conn.cursor()
+        # Acess to DB
+        self.cursor.execute('''
+            INSERT INTO guests (
+                name, surname, gender, age, country,
+                intensions, gifts, behave)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''',
+                            (person_name, person_surname, self.st_gender.text,
+                                age_is_numeric, self.st_country.text,
+                                self.st_intensions.text, gifts_is_numeric,
+                                self.st_behave.text))
 
-            cursor.execute('''
-                INSERT INTO guests (
-                    name, surname, gender, age, country,
-                    intensions, gifts, behave)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    ''',
-                                (person_name, person_surname,
-                                    self.st_gender.text,
-                                    int(self.st_age.text),
-                                    self.st_country.text,
-                                    self.st_intensions.text,
-                                    int(self.st_gifts.text),
-                                    self.st_behave.text))
+        self.conn.commit()
 
-        finally:
-            conn.commit()
+        # To Check guests register
+        check_guests_registration()
 
     def stop(self):
         self.conn.close()
+
+# To Check guests register
+# check_guests_registration()
 
 
 class ParentApp(App):
