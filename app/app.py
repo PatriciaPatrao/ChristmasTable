@@ -88,15 +88,15 @@ class MyApp(GridLayout):
                                 on_text_validate=self.validate_numeric)
         self.add_widget(self.st_age)
 
-        self.add_widget(Label(text='Country'))
+        self.add_widget(Label(text='Where do you come from?'))
         self.st_country = TextInput(multiline=False)
         self.add_widget(self.st_country)
 
-        self.add_widget(Label(text='Say Something Nice'))
+        self.add_widget(Label(text='Something you would like to share'))
         self.st_intensions = TextInput(multiline=False)
         self.add_widget(self.st_intensions)
 
-        self.add_widget(Label(text='How many Gifts do you bring'))
+        self.add_widget(Label(text='How many Gifts do you bring?'))
         self.st_gifts = TextInput(multiline=False,
                                   input_type='number',
                                   on_text_validate=self.validate_numeric)
@@ -182,13 +182,6 @@ class MyApp(GridLayout):
             print('Name and Surname must be different!\n')
             return
 
-        # Check if the Name is a repeat
-        # if person_name in self.previous_names:
-        #     print('Name must be different from previous entries!')
-        #     return
-        # else:
-        #     self.previous_names.add(person_name)
-
         # Age and Gits are integers
         age_is_numeric = self.validate_numeric(self.st_age.text)
         if not age_is_numeric:
@@ -198,6 +191,7 @@ class MyApp(GridLayout):
         if not gifts_is_numeric:
             print('Please enter a valid number of gifts, must be an integer!\n') # noqa E401
             return
+
         # Gender and Behaviour Buttons were used
         if self.st_gender.text == 'Select':
             print('Please enter your Gender!\n')
