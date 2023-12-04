@@ -185,8 +185,13 @@ class MyApp(GridLayout):
 
         # Age and Gits are integers
         age_is_numeric = self.validate_numeric(self.st_age.text)
+        if not age_is_numeric:
+            print('Please enter a valid age, must be an integer!\n')
+            return
         gifts_is_numeric = self.validate_numeric(self.st_gifts.text)
-
+        if not gifts_is_numeric:
+            print('Please enter a valid number of gifts, must be an integer!\n') # noqa E401
+            return
         # Gender and Behaviour Buttons were used
         if self.st_gender.text == 'Select':
             print('Please enter your Gender!\n')
