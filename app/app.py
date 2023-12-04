@@ -115,7 +115,7 @@ class MyApp(GridLayout):
         self.conn = sqlite3.connect('Christmas_Table.db')
         self.cursor = self.conn.cursor()
 
-        # Taable Creation
+        # Table Creation
         self.cursor.execute('''
                             CREATE TABLE IF NOT EXISTS guests (
                             id INTEGER PRIMARY KEY AUTOINCREMENT,
