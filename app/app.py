@@ -20,7 +20,7 @@ def valid_name(name):
 
     name = name.strip()
     return (
-        5 <= len(name) <= 50 and
+        4 <= len(name) <= 50 and
         name.isalpha() and
         not name.isspace() and
         name[0].isupper() and
@@ -86,38 +86,102 @@ class MyApp(GridLayout):
         self.press.bind(on_press=self.save)
         self.add_widget(self.press)
 
+        # SQLite DB
+        self.conn = sqlite3.connect('Christmas_Table.db')
+        self.cursor = self.conn.cursor()
+
+        # Taable Creation
+        self.cursor.execute('''
+                            CREATE TABLE IF NOT EXISTS guests (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name TEXT NOT NULL,
+                            surname NOT NULL,
+                            gender TEXT NOT NULL,
+                            age INTEGER NOT NULL,
+                            country TEXT NOT NULL,
+                            intensions TEXT NOT NULL,
+                            gifts INTEGER NOT NULL,
+                            behave TEXT NOT NULL
+                            )
+                        ''')
+        self.conn.commit()
+
+        self.error_displayed = False
+
     def validate_name(self, input_name):
         if not valid_name(input_name.text):
             self.st_name.text = ''
             self.st_surname.text = ''
-            print('Invalid Entry!\nPlease enter a valid one!')
+            print('Invalid Entry!\nPlease enter a valid one!\n')
 
     def validate_numeric(self, input_number):
-        try:
-            number = int(input_number)
-            if number < 0:
-                print('You can not input a negative number!')
-                return False
-            return True
-        except ValueError:
-            self.st_age.text = ''
-            self.st_gifts.text = ''
-            print('Invalid entry!\nPlease enter an integer value!')
+        # try:
+        #     number = int(input_number)
+        #     if number < 0:
+        #         if not getattr(self, 'error_displayed', False):
+        #             print('You can not input a negative number!\n')
+        #             # setattr(self, 'age_error_displayed', True)
+        #             self.error_displayed = True
+        #             return False
+        #     return True
+        # except ValueError:
+        #     # if not getattr(self, 'error_displayed', False):
+        #     if not self.error_displayed:
+        #         self.st_age.text = ''
+        #         self.st_gifts.text = ''
+        #         print('Invalid entry!\nPlease enter an integer value!\n')
+        #         self.error_displayed = True
+        #     return False
+        if not input_number.isnumeric():
+            if not self.error_displayed:
+                self.st_age.text = ''
+                self.st_gifts.text = ''
+                print('Invalid entry!\nPlease enter an integer value!\n')
+                self.error_displayed = True
             return False
 
-    def save(self, instance):
-        # Person Name is Valid
-        self.validate_name(self.st_name)
-        person_name = self.st_name.text.strip()
+        number = int(input_number)
+        if number < 0:
+            if not self.error_displayed:
+                print('You cannot input a negative number!\n')
+                self.error_displayed = True
+                return False
 
-        # Person Surname is Valid
-        self.validate_name(self.st_surname)
+        return True
+
+    def save(self, instance):
+        '''Function that saves the correct entries'''
+
+        # Reset error_displayed for each new user
+        self.error_displayed = False
+
+        # Name is Valid
+        # self.validate_name(self.st_name)
+        person_name = self.st_name.text.strip()
+        if not valid_name(self.st_name.text):
+            self.st_name.text = ''
+            print('Invalid Name!\nPlease enter a valid one!')
+            return
+
+        # Surname is Valid
+        # self.validate_name(self.st_surname)
         person_surname = self.st_surname.text.strip()
+        if not valid_name(self.st_surname.text):
+            self.st_surname.text = ''
+            print('Invalid Surname!\nPlease enter a valid one!')
+            return
 
         # Name and Surname are not equal
         if person_name.lower() == person_surname.lower():
-            print('Name and Surname must be different!')
+            print('Name and Surname must be different!\n')
             return
+
+        # Check if the Name is a repeat
+        # if person_name in self.previous_names:
+        #     print('Name must be different from previous entries!')
+        #     return
+        # else:
+        #     self.previous_names.add(person_name)
 
         # Age and Gits are integers
         age_is_numeric = self.validate_numeric(self.st_age.text)
@@ -125,15 +189,15 @@ class MyApp(GridLayout):
 
         # Gender and Behaviour Buttons were used
         if self.st_gender.text == 'Select':
-            print('Please enter your Gender!')
+            print('Please enter your Gender!\n')
             return
         if self.st_behave.text == 'Select':
-            print('Please enter if you behave this year!')
+            print('Please enter if you behave this year!\n')
             return
 
         # Checking if the nº of gifts is enough
         if gifts_is_numeric and int(self.st_gifts.text) < 5:
-            print("Is that all the magic you've got in your sleigh?\nLooks like someone might be on the 'Naughty List' for a gift shortage!")  # noqa E401
+            print("Is that all the magic you've got in your sleigh?\nLooks like someone might be on the 'Naughty List' for a gift shortage!\n")  # noqa E401
             return
 
         if valid_name(person_name) and valid_name(person_surname) and age_is_numeric and gifts_is_numeric:  # noqa E401
@@ -146,10 +210,35 @@ class MyApp(GridLayout):
             print('Number of Gifts ', self.st_gifts.text)
             print('Good Behaviour ', self.st_behave.text)
 
-            if self.st_behave.text == 'No':
-                print("Looks like Santa has detected some questionable behavior on his radar!\nYour case is under review.\nHang tight and reconsider those life choices!")  # noqa E401
+            if self.st_behave.text == 'Maybe Not...':
+                print("Looks like Santa has detected some questionable behavior on his radar!\nYour case is under review.\nHang tight and reconsider those life choices!\n")  # noqa E401
             else:
-                print('Congratulations!\nYour seat at the Christmas Table is secured!\nGet ready to jingle all the way!!')  # noqa E401
+                print('Congratulations!\nYour seat at the Christmas Table is secured!\nGet ready to jingle all the way!!\n')  # noqa E401
+
+        # Connection in sqlite
+        try:
+            conn = sqlite3.connect('Christmas_Table.db')
+            cursor = conn.cursor()
+
+            cursor.execute('''
+                INSERT INTO guests (
+                    name, surname, gender, age, country,
+                    intensions, gifts, behave)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    ''',
+                                (person_name, person_surname,
+                                    self.st_gender.text,
+                                    int(self.st_age.text),
+                                    self.st_country.text,
+                                    self.st_intensions.text,
+                                    int(self.st_gifts.text),
+                                    self.st_behave.text))
+
+        finally:
+            conn.commit()
+
+    def stop(self):
+        self.conn.close()
 
 
 class ParentApp(App):
