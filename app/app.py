@@ -36,6 +36,10 @@ def consecutive_duplicates(duplicate):
     return bool(re.search(r'(.)\1{3,}', duplicate))
 
 
+def valid_origin(origin):
+    return origin.isalpha() and len(origin) <= 20
+
+
 def check_guests_registration():
     '''Conecting with DB'''
     conn = sqlite3.connect('Christmas_Table.db')
@@ -89,12 +93,13 @@ class MyApp(GridLayout):
         self.add_widget(self.st_age)
 
         self.add_widget(Label(text='Where do you come from?'))
-        self.st_country = TextInput(multiline=False)
+        self.st_country = TextInput(multiline=False,
+                                    on_text_validate=self.validate_origin)
         self.add_widget(self.st_country)
 
         self.add_widget(Label(text='Something you would like to share'))
-        self.st_intensions = TextInput(multiline=False)
-        self.add_widget(self.st_intensions)
+        self.st_thoughts = TextInput(multiline=True)
+        self.add_widget(self.st_thoughts)
 
         self.add_widget(Label(text='How many Gifts do you bring?'))
         self.st_gifts = TextInput(multiline=False,
@@ -124,7 +129,7 @@ class MyApp(GridLayout):
                             gender TEXT NOT NULL,
                             age INTEGER NOT NULL,
                             country TEXT NOT NULL,
-                            intensions TEXT NOT NULL,
+                            thoughts TEXT NOT NULL,
                             gifts INTEGER NOT NULL,
                             behave TEXT NOT NULL
                             )
@@ -156,6 +161,12 @@ class MyApp(GridLayout):
                 return False
 
         return True
+
+    def validate_origin(self, origin):
+        if not valid_origin(origin.text):
+            self.st_country.text = ''
+            print('Please enter a Valid Region!\n')
+        return False
 
     def save(self, instance):
         '''Function that saves the correct entries'''
@@ -200,6 +211,16 @@ class MyApp(GridLayout):
             print('Please enter if you behave this year!\n')
             return
 
+        # Country is introduced
+        if not self.st_country.text:
+            print('Please enter your country of origin!\n')
+            return
+
+        # Thoughts were introduced
+        if not self.st_thoughts.text:
+            print('Please share something with the other guests!\n')
+            return
+
         # Checking if the nº of gifts is enough
         if gifts_is_numeric and int(self.st_gifts.text) < 5:
             print("Is that all the magic you've got in your sleigh?\nLooks like someone might be on the 'Naughty List' for a gift shortage!\n")  # noqa E401
@@ -211,7 +232,7 @@ class MyApp(GridLayout):
             print('Gender ', self.st_gender.text)
             print('Age ', self.st_age.text)
             print('Country ', self.st_country.text)
-            print('Intensions ', self.st_intensions.text)
+            print('Thoughts ', self.st_thoughts.text)
             print('Number of Gifts ', self.st_gifts.text)
             print('Good Behaviour ', self.st_behave.text)
 
@@ -224,12 +245,12 @@ class MyApp(GridLayout):
         self.cursor.execute('''
             INSERT INTO guests (
                 name, surname, gender, age, country,
-                intensions, gifts, behave)
+                thoughts, gifts, behave)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ''',
                             (person_name, person_surname, self.st_gender.text,
                                 age_is_numeric, self.st_country.text,
-                                self.st_intensions.text, gifts_is_numeric,
+                                self.st_thoughts.text, gifts_is_numeric,
                                 self.st_behave.text))
 
         self.conn.commit()
