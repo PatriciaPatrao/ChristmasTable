@@ -1,0 +1,135 @@
+#:kivy 2.0.0
+
+<CustomTextInput@TextInput>:
+    foreground_color: 0, 0, 0, 1  # Texto preto
+    background_color: 0.9, 0.9, 0.9, 1  # Cinza claro
+    multiline: True
+
+<CustomSpinner@Spinner>:
+    background_color: 0.9, 0.9, 0.9, 1  # Cinza claro
+    foreground_color: 0, 0, 0, 1  # Texto preto
+
+<MyApp>:
+    cols: 2
+    spacing: 10
+    padding: 10
+    canvas.before:
+        Color:
+            rgba: 0.7, 0, 0, 1  # Fundo vermelho
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: 'Name'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Enter your name...'
+        multiline: False
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Surname'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Enter your surname...'
+        multiline: False
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Gender'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomSpinner:
+        text: 'Select gender'
+        values: ('Female', 'Male')
+        background_color: 0.7, 0.7, 0.7, 1  # Cinza claro
+        foreground_color: 0, 0, 0, 1  # Texto preto
+
+    Label:
+        text: 'Age'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Enter your age...'
+        multiline: False
+        input_type: 'number'
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Country'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Enter your country...'
+        multiline: False
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Thoughts'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Share your thoughts...'
+        multiline: False
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Number of Gifts'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomTextInput:
+        hint_text: 'Enter the number of gifts...'
+        multiline: False
+        input_type: 'number'
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        background_color: 1, 1, 1, 1  # Fundo branco
+
+    Label:
+        text: 'Behave this year?'
+        color: 0, 0, 0, 1  # Texto preto
+        size_hint_y: None
+        height: self.texture_size[1]
+        valign: 'middle'
+
+    CustomSpinner:
+        text: 'Select behavior'
+        values: ('Off Course!', 'Maybe Not...')
+        background_color: 0.7, 0.7, 0.7, 1  # Cinza claro
+        foreground_color: 0, 0, 0, 1  # Texto preto
+
+    CustomButton:
+        text: 'Save'
+        size_hint: (None, None)
+        size: 200, 50
+        background_color: 0.7, 0.7, 0.7, 1  # Cinza claro
+        foreground_color: 0, 0, 0, 1  # Texto preto
+        on_press: app.on_button_press(self)
