@@ -1,3 +1,5 @@
+import re
+import sqlite3
 import kivy
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -5,8 +7,17 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
-import sqlite3
-import re
+from kivy.config import Config
+# from kivy.lang import Builder  # Importe o módulo Builder
+
+# Carregue o arquivo KV manualmente
+# Builder.load_file('myapp.kv')
+
+
+# # App configurations
+# Config.set('graphics', 'width', '400')
+# Config.set('graphics', 'height', '300')
+# Config.set('graphics', 'resizable', False)
 
 
 def valid_name(name):
@@ -37,11 +48,17 @@ def consecutive_duplicates(duplicate):
 
 
 def valid_origin(origin):
+
+    '''This function mas sure that country 
+    is numeric and no more than 20 caracters'''
+
     return origin.isalpha() and len(origin) <= 20
 
 
 def check_guests_registration():
+
     '''Conecting with DB'''
+
     conn = sqlite3.connect('Christmas_Table.db')
 
     try:
@@ -66,6 +83,9 @@ def check_guests_registration():
 
 
 class MyApp(GridLayout):
+
+    '''Class that defines the APP'''
+
     def __init__(self, **kwargs):
         super(MyApp, self).__init__()
         self.cols = 2
@@ -139,12 +159,18 @@ class MyApp(GridLayout):
         self.error_displayed = False
 
     def validate_name(self, input_name):
+
+        '''Name input Validation'''
+
         if not valid_name(input_name.text):
             self.st_name.text = ''
             self.st_surname.text = ''
             print('Invalid Entry!\nPlease enter a valid one!\n')
 
     def validate_numeric(self, input_number):
+
+        '''Age and Numeber of Gifts Validation'''
+
         if not input_number.isnumeric():
             if not self.error_displayed:
                 self.st_age.text = ''
@@ -163,12 +189,16 @@ class MyApp(GridLayout):
         return True
 
     def validate_origin(self, origin):
+
+        '''Country input Validation'''
+
         if not valid_origin(origin.text):
             self.st_country.text = ''
             print('Please enter a Valid Region!\n')
         return False
 
     def save(self, instance):
+
         '''Function that saves the correct entries'''
 
         # Reset error_displayed for each new user
@@ -259,13 +289,16 @@ class MyApp(GridLayout):
         check_guests_registration()
 
     def stop(self):
-        self.conn.close()
 
-# To Check guests register
-# check_guests_registration()
+        '''Stops the connection with de DB'''
+
+        self.conn.close()
 
 
 class ParentApp(App):
+
+    '''Parent App that makes the original App run'''
+
     def build(self):
         return MyApp()
 
